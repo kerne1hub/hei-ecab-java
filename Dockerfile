@@ -1,7 +1,7 @@
-FROM adoptopenjdk/openjdk11:latest
+FROM openjdk:8-jdk-alpine
 
 RUN mkdir -p /software
 
 ADD target/hei-ecab.jar /software/hei-ecab.jar
 
-CMD java -Dserver.port=$PORT $JAVA_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -jar /software/hei-ecab.jar
+CMD java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Xmx256m -Xss512k -XX:MetaspaceSize=100m -Dserver.port=$PORT $JAVA_OPTS -jar /software/hei-ecab.jar
