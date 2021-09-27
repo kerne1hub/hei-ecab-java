@@ -76,6 +76,8 @@
     </dependencies>
 
     <build>
+        <finalName>hei-ecab</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
