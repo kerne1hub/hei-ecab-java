@@ -8,10 +8,7 @@ import kernel.heiecab.dto.response.Response;
 import kernel.heiecab.repository.UserRepository;
 import kernel.heiecab.security.JwtSigner;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
@@ -60,6 +57,7 @@ public class AuthService {
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
+                    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
                     return new ResponseEntity<>(UserMapper.INSTANCE.toDTO(user), headers, HttpStatus.OK);
                 });
