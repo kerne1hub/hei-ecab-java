@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class RegisterResponse implements Response {
+public class UserResponse implements Response {
     private Integer id;
     private String firstName;
     private String lastName;

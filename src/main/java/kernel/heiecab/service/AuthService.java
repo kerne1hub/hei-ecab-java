@@ -3,7 +3,7 @@ package kernel.heiecab.service;
 import kernel.heiecab.dto.mapper.UserMapper;
 import kernel.heiecab.dto.request.AuthRequest;
 import kernel.heiecab.dto.request.RegisterRequest;
-import kernel.heiecab.dto.response.RegisterResponse;
+import kernel.heiecab.dto.response.UserResponse;
 import kernel.heiecab.dto.response.Response;
 import kernel.heiecab.repository.UserRepository;
 import kernel.heiecab.security.JwtSigner;
@@ -19,26 +19,26 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtSigner jwtSigner;
 
-    public Mono<RegisterResponse> register(RegisterRequest request) {
+    public Mono<ResponseEntity<UserResponse>> register(RegisterRequest request) {
         return isUserExist(request.getUsername())
                 .filter(isExist -> !isExist)
-                .switchIfEmpty(Mono.error(new RuntimeException("User already exist!")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exist!")))
                 .flatMap(isNotExist -> userRepository.save(UserMapper.INSTANCE.fromDto(request)))
-                .flatMap(user -> Mono.just(UserMapper.INSTANCE.toDTO(user)))
-                .log();
+                .map(UserMapper.INSTANCE::toDTO)
+                .map(ResponseEntity::ok);
     }
 
     private Mono<Boolean> isUserExist(String username) {
         return userRepository.findByUsername(username)
-                .flatMap(user -> Mono.just(true))
+                .map(user -> true)
                 .switchIfEmpty(Mono.just(false));
     }
 
-    public Mono<ResponseEntity<RegisterResponse>> getProfile(String username) {
+    public Mono<ResponseEntity<UserResponse>> getProfile(String username) {
         return userRepository.findByUsername(username)
-                .flatMap(user -> Mono.just(ResponseEntity.ok(UserMapper.INSTANCE.toDTO(user))))
-                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()))
-                .log();
+                .map(UserMapper.INSTANCE::toDTO)
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
     }
 
     public Mono<ResponseEntity<Response>> login(AuthRequest request) {
@@ -57,7 +57,6 @@ public class AuthService {
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
-                    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
                     return new ResponseEntity<>(UserMapper.INSTANCE.toDTO(user), headers, HttpStatus.OK);
                 });

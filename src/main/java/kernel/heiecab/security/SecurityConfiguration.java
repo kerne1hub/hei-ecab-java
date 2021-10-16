@@ -26,9 +26,6 @@ public class SecurityConfiguration {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
                                                          ReactiveAuthenticationManager jwtAuthManager,
                                                          ServerAuthenticationConverter jwtAuthConverter) {
-
-
-
         final AuthenticationWebFilter authWebFilter = new AuthenticationWebFilter(jwtAuthManager);
         authWebFilter.setServerAuthenticationConverter(jwtAuthConverter);
         authWebFilter.setRequiresAuthenticationMatcher(negateWhiteList);
